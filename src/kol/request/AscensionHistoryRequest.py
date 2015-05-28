@@ -27,11 +27,13 @@ class AscensionHistoryRequest(GenericRequest):
         famUsage -- The use percentage of the most used familiar
             mode -- The mode of ascension (normal, hardcore, casual, BM)
             path -- The path of the ascension (teet, booze, oxy)
+             fun -- OCRS fun value of the ascension
         """
 
         fullAscensionPattern = PatternManager.getOrCompilePattern('fullAscension')
         famPattern = PatternManager.getOrCompilePattern('familiarAscension')
         namePattern = PatternManager.getOrCompilePattern('playerName')
+        funPattern = PatternManager.getOrCompilePattern('ascensionFun')
 
         stripText = self.responseText.replace("&nbsp;", "")
 
@@ -51,6 +53,7 @@ class AscensionHistoryRequest(GenericRequest):
             ascMode = ascension.group(14)
 
             ascPath = ascension.group(16)
+            ascFun = None
             try:
                 ascEnd = datetime.strptime(ascDate, "%m/%d/%y")
             except ValueError:
@@ -81,7 +84,13 @@ class AscensionHistoryRequest(GenericRequest):
             if (not ascPath):
                 ascPath = "None"
 
+            for match in funPattern.finditer(ascPath):
+                ascPath = match.group(1)
+                ascFun = int(match.group(2))
+
             asc = {"id":ascNumber, "start":ascStart, "end":ascEnd, "level":ascLevel, "charClass":ascClass, "sign":ascSign, "turns":ascTurns, "days":ascDays, "familiar":ascFamiliar, "famUsage":ascFamUsage, "mode":ascMode, "path":ascPath}
+            if ascFun is not None:
+                asc["fun"] = ascFun
             ascensions.append(asc)
 
         self.responseData["ascensions"] = ascensions
