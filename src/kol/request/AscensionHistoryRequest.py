@@ -86,7 +86,7 @@ class AscensionHistoryRequest(GenericRequest):
 
             for match in funPattern.finditer(ascPath):
                 ascPath = match.group(1)
-                ascFun = int(match.group(2))
+                ascFun = int(match.group(2).replace(',', ''))
 
             asc = {"id":ascNumber, "start":ascStart, "end":ascEnd, "level":ascLevel, "charClass":ascClass, "sign":ascSign, "turns":ascTurns, "days":ascDays, "familiar":ascFamiliar, "famUsage":ascFamUsage, "mode":ascMode, "path":ascPath}
             if ascFun is not None:
